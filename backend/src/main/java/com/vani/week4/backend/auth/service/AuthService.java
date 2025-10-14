@@ -11,9 +11,7 @@ import com.vani.week4.backend.auth.repository.AuthRepository;
 import com.vani.week4.backend.auth.security.JwtTokenProvider;
 import com.vani.week4.backend.global.exception.*;
 import com.vani.week4.backend.user.entity.User;
-import com.vani.week4.backend.user.entity.UserProfile;
 import com.vani.week4.backend.user.entity.UserStatus;
-import com.vani.week4.backend.user.repository.UserProfileRepository;
 import com.vani.week4.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -35,7 +33,6 @@ public class AuthService {
 
     private final AuthRepository authRepository;
     private final UserRepository userRepository;
-    private final UserProfileRepository userProfileRepository;
 //    private final UserInternalApiClient userApiClient;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -62,12 +59,11 @@ public class AuthService {
         User user = User.createUser(
                 userId,
                 signUpRequest.nickname(),
-                UserStatus.ACTIVE
+                signUpRequest.email(),
+                signUpRequest.profileImageKey()
                 );
         userRepository.save(user);
 
-        UserProfile userProfile = UserProfile.createUserprofile(user, signUpRequest.email());
-        userProfileRepository.save(userProfile);
 
         //Auth 생성 요청
         Auth auth = Auth.ceateAuth(

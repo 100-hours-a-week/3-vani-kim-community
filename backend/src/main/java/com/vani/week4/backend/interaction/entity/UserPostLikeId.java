@@ -16,8 +16,8 @@ import java.util.Objects;
 @AllArgsConstructor
 // JPA 표준 스펙 : Embeddable은  Serializable 인터페이스 필수
 public class UserPostLikeId implements Serializable {
-    private Long userId;
-    private Long postId;
+    private String userId;
+    private String postId;
 
     // 동일성 판단 기준 : Lombok의 @Data로 대체 가능
     @Override

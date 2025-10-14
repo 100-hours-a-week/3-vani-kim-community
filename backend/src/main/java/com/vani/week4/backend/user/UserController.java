@@ -1,8 +1,42 @@
 package com.vani.week4.backend.user;
 
+import com.vani.week4.backend.global.CurrentUser;
+import com.vani.week4.backend.user.dto.UserResponse;
+import com.vani.week4.backend.user.dto.UserUpdateRequest;
+import com.vani.week4.backend.user.entity.User;
+import com.vani.week4.backend.user.service.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 /**
  * @author vani
  * @since 10/8/25
  */
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/users")
 public class UserController {
+
+    private final UserService userService;
+
+    //회원 정보 조회
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(@CurrentUser User user) {
+        UserResponse userResponse = userService.getUserInfo(user);
+        return ResponseEntity.ok(userResponse);
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<UserResponse> updateCurrentUser(
+            @CurrentUser User user,
+            @Valid @RequestBody UserUpdateRequest request) {
+
+        UserResponse response = userService.updateUser(user, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

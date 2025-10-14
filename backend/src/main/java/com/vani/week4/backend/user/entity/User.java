@@ -28,6 +28,8 @@ public class User {
     @Column(length = 10, nullable = false)
     private String nickname;
 
+    private String profileImageKey;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20) //DB나 서버 둘중 하나만봐도 어떤 상태인지 알 수 있도록 varchar
     private UserStatus userStatus;
@@ -36,32 +38,38 @@ public class User {
     @Column(length = 10) //DB나 서버 둘중 하나만봐도 어떤 상태인지 알 수 있도록 varchar
     private UserRole userRole;
 
+    @Column(length = 300, nullable = false, unique = true)
+    private String email;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Like> likes = new ArrayList<>();
 
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
-    private LocalDateTime deleted_at;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 
     protected User(){}
 
-    public static User createUser(String id, String nickname, UserStatus userStatus){
+    public static User createUser(String id, String nickname, String email,String profileImageKey){
         return User.builder()
                 .id(id)
                 .nickname(nickname)
-                .userStatus(userStatus)
+                .email(email)
+                .profileImageKey(profileImageKey)
+                .userStatus(UserStatus.ACTIVE)
                 .userRole(UserRole.USER)
-                .created_at(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 
     public void updateNickname(String nickname){
         this.nickname = nickname;
     }
-
+    public void updateEmail(String email){ this.email = email;}
+    public void updateProfileImageKey(String profileImageKey){  this.profileImageKey = profileImageKey;}
     public void updateUserStatus(UserStatus userStatus){
         this.userStatus = userStatus;
     }

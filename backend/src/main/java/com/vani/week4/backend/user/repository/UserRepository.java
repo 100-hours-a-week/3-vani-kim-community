@@ -14,5 +14,4 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByNickname(String nickname);
 
-    Optional<User> findByEmail(String email);       //null 체크까지 한번에
 }
