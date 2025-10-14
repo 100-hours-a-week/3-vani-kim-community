@@ -8,6 +8,7 @@ import lombok.*;
  * @author vani
  * @since 10/8/25
  */
+// TODO email필드를 제거해야함. 현재는 로그인시 Auth탐색용으로 사용... identifier등으로 대체
 @Entity
 @Getter
 @Setter

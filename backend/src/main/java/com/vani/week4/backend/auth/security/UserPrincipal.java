@@ -2,6 +2,7 @@ package com.vani.week4.backend.auth.security;
 
 import com.vani.week4.backend.user.entity.User;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,7 @@ import java.util.Collections;
  * @since 10/14/25
  */
 @Getter
+@RequiredArgsConstructor
 public class UserPrincipal implements UserDetails {
     private User user;
 
