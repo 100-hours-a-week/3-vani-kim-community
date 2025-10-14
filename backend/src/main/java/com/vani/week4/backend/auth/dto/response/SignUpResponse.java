@@ -1,22 +1,21 @@
-package com.vani.week4.backend.auth.dto;
-
-import com.vani.week4.backend.user.entity.User;
+package com.vani.week4.backend.auth.dto.response;
 
 /**
+ * 회원가입 응답 DTO
  * @author vani
  * @since 10/10/25
+ *
  */
-public class SignUpResponse (
-    String id,
-    String email,
-    String nickname,
-    String createAt
+public record SignUpResponse (
+    String userId,
+    String accessToken,
+    String refreshToken
 ) {
-    public static SignUpResponse from(User user){
-        return new SignUpResponse(
-                user.getId(),
-                user.getEmail(),
-                user.get
-        )
+    public static SignUpResponse of(
+            String userId,
+            String accessToken,
+            String refreshToken
+    ) {
+        return new SignUpResponse(userId, accessToken, refreshToken);
     }
 }

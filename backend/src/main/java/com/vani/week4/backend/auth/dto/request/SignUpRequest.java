@@ -1,4 +1,4 @@
-package com.vani.week4.backend.auth.dto;
+package com.vani.week4.backend.auth.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
