@@ -74,4 +74,13 @@ public class Post {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void incrementViewCount() {
+        this.viewCount++;
+    }
+    public void incrementCommentCount() {
+        this.commentCount++;
+    }
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
 }

@@ -4,17 +4,14 @@ import com.vani.week4.backend.post.entity.Post;
 import com.vani.week4.backend.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- *
- */
+
 @Entity
-@Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment {
@@ -38,14 +35,46 @@ public class Comment {
     @Column(length = 26)
     private String commentGroup;
 
-    @Column(length = 2000)
+    @Column(length = 1000)
     private String content;
 
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
-    private LocalDateTime deleted_at;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private CommentStatus commentStatus;
+
+    @Builder
+    private Comment(String id, User user, Post post, String parentId,
+                    Integer depth, String commentGroup, String content) {
+        this.id = id;
+        this.user = user;
+        this.post = post;
+        this.parentId = parentId;
+        this.depth = depth;
+        this.commentGroup = commentGroup;
+        this.content = content;
+        this.createdAt = LocalDateTime.now();
+        this.commentStatus = CommentStatus.ACTIVE;
+    }
+
+    // 루트 댓글의 commentGroup 업데이트
+    public void updateCommentGroup(String commentGroup) {
+        this.commentGroup = commentGroup;
+    }
+
+    // 수정
+    public void updateContent(String content) {
+        this.content = content;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // Soft delete
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
+        this.commentStatus = CommentStatus.DELETED;
+    }
+
 }

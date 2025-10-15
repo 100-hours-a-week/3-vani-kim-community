@@ -1,4 +1,4 @@
-package com.vani.week4.backend.post.dto.response;
+package com.vani.week4.backend.global.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
