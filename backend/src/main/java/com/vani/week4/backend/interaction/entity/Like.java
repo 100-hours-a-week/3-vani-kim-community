@@ -6,10 +6,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@Setter
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user_post_like")
@@ -26,4 +24,10 @@ public class Like {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
+
+    public Like(User user, Post post) {
+        this.userPostLikeId = new UserPostLikeId(user.getId(), post.getId());
+        this.user = user;
+        this.post = post;
+    }
 }
