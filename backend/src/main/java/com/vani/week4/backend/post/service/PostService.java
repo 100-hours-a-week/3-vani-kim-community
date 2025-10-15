@@ -8,12 +8,11 @@ import com.vani.week4.backend.post.dto.request.PostUpdateRequest;
 import com.vani.week4.backend.post.dto.response.PostDetailResponse;
 import com.vani.week4.backend.post.dto.response.PostResponse;
 import com.vani.week4.backend.post.dto.response.PostSummaryResponse;
-import com.vani.week4.backend.post.dto.response.SliceResponse;
+import com.vani.week4.backend.global.dto.SliceResponse;
 import com.vani.week4.backend.post.entity.Post;
 import com.vani.week4.backend.post.entity.PostContent;
 import com.vani.week4.backend.post.repository.PostRepository;
 import com.vani.week4.backend.user.entity.User;
-import com.vani.week4.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,8 +32,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
-
     /**
      * 게시글 목록 커서 페이징을 위한 메서드, 생성일자와 Id 기준으로 내림차순
      * @param cursorId : 커서 페이징을 위한 postId
@@ -46,6 +43,7 @@ public class PostService {
             LocalDateTime cursorCreatedAt,
             int size
     ) {
+        // 정렬된 post들 가져오기
         Pageable pageable = PageRequest.of(0, size);
         Slice<Post> posts = postRepository.findByCursor(cursorCreatedAt, cursorId, pageable);
 
@@ -88,12 +86,14 @@ public class PostService {
     }
 
     /**
-     * 게시글 id를 이용하여 게시글 살세 정보를 불러 오는 메서드
+     * 게시글 id를 이용하여 게시글 상세 정보를 불러 오는 메서드
      * @param postId : 게시글 아이디
      * */
     public PostDetailResponse getPostDetail(String postId){
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+        //TODO Count 로직 개선 필요
+        post.incrementViewCount();
         return new PostDetailResponse(
                 post.getId(),
                 post.getTitle(),

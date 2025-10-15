@@ -6,7 +6,7 @@ import com.vani.week4.backend.post.dto.request.PostUpdateRequest;
 import com.vani.week4.backend.post.dto.response.PostDetailResponse;
 import com.vani.week4.backend.post.dto.response.PostResponse;
 import com.vani.week4.backend.post.dto.response.PostSummaryResponse;
-import com.vani.week4.backend.post.dto.response.SliceResponse;
+import com.vani.week4.backend.global.dto.SliceResponse;
 import com.vani.week4.backend.post.service.PostService;
 import com.vani.week4.backend.user.entity.User;
 import jakarta.validation.Valid;

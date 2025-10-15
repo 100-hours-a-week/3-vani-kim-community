@@ -73,4 +73,22 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCommentNotFound(CommentNotFoundException ex){
+        ErrorResponse response = new ErrorResponse("COMMENT_NOT_FOUND", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidCommentException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidComment(InvalidCommentException ex){
+        ErrorResponse response = new ErrorResponse("INVALID_COMMENT", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MaxDepthExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxDepthExceeded(MaxDepthExceededException ex){
+        ErrorResponse response = new ErrorResponse("MAX_DEPTH_EXCEEDED", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
 }
