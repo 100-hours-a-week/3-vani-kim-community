@@ -38,9 +38,6 @@ public class User {
     @Column(length = 10) //DB나 서버 둘중 하나만봐도 어떤 상태인지 알 수 있도록 varchar
     private UserRole userRole;
 
-    @Column(length = 300, nullable = false, unique = true)
-    private String email;
-
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Post> posts = new ArrayList<>();
 
@@ -53,11 +50,10 @@ public class User {
 
     protected User(){}
 
-    public static User createUser(String id, String nickname, String email,String profileImageKey){
+    public static User createUser(String id, String nickname,String profileImageKey){
         return User.builder()
                 .id(id)
                 .nickname(nickname)
-                .email(email)
                 .profileImageKey(profileImageKey)
                 .userStatus(UserStatus.ACTIVE)
                 .userRole(UserRole.USER)
@@ -68,7 +64,6 @@ public class User {
     public void updateNickname(String nickname){
         this.nickname = nickname;
     }
-    public void updateEmail(String email){ this.email = email;}
     public void updateProfileImageKey(String profileImageKey){  this.profileImageKey = profileImageKey;}
     public void updateUserStatus(UserStatus userStatus){
         this.userStatus = userStatus;

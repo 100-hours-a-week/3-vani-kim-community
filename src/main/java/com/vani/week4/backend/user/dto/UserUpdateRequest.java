@@ -11,9 +11,6 @@ import jakarta.validation.constraints.Size;
  *
  */
 public record UserUpdateRequest(
-    @Email(message = "올바른 이메일 형식이 아닙니다")
-    String email,
-
     @Size(min = 1, max = 10, message = "닉네임은 1자이상 10자 이하여야합니다")
     @Pattern(regexp = "^[가-힣a-zA-Z0-9]+$", message = "닉네임은 한글, 영문, 숫자만 가능합니다")
     String nickname,

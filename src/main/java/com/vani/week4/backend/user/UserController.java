@@ -22,13 +22,15 @@ public class UserController {
 
     private final UserService userService;
 
+    // 생성과 삭제는 Auth에서 담당
+
     //회원 정보 조회
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(@CurrentUser User user) {
         UserResponse userResponse = userService.getUserInfo(user);
         return ResponseEntity.ok(userResponse);
     }
-
+    //회원정보 수정
     @PatchMapping("/me")
     public ResponseEntity<UserResponse> updateCurrentUser(
             @CurrentUser User user,

@@ -10,13 +10,11 @@ import lombok.*;
 @Getter
 @Builder
 public class UserResponse {
-    private String email;
     private String nickname;
     private String profileImageKey;
 
     public static UserResponse of(User user){
         return UserResponse.builder()
-                .email(user.getEmail())
                 .nickname(user.getNickname())
                 .profileImageKey(user.getProfileImageKey())
                 .build();

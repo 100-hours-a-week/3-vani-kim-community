@@ -21,7 +21,6 @@ public class UserService {
     @Transactional
     public UserResponse getUserInfo(User user) {
         return UserResponse.builder()
-                .email(user.getEmail())
                 .nickname(user.getNickname())
                 .profileImageKey(user.getProfileImageKey())
                 .build();
@@ -32,10 +31,6 @@ public class UserService {
 
         if (request.nickname() != null) {
             user.updateNickname(request.nickname());
-        }
-
-        if (request.email() != null) {
-            user.updateEmail(request.email());
         }
 
         if (request.profileImageKey() != null) {
