@@ -35,7 +35,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
-
+        // (★ 추가 ★) OPTIONS 요청은 JWT 검증 없이 즉시 통과 (CORS Preflight 처리)
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            // filterChain.doFilter(request, response); // OPTIONS는 여기서 끝내야 함
+            return; // 필터 체인 진행 중단하고 즉시 응답 반환
+        }
         String token = resolveToken(request);
 
         //TODO 블랙리스트 추가시 변경 필수, 권한 설정 필요

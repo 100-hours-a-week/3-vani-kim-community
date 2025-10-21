@@ -18,7 +18,6 @@ public record PostResponse(
             String postImageKey
     ) {}
     public record Author (
-            String name,
-            String email
+            String name
     ) {}
 }

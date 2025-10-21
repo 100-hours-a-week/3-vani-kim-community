@@ -45,24 +45,37 @@ public class PostService {
     ) {
         // 정렬된 post들 가져오기
         Pageable pageable = PageRequest.of(0, size);
-        Slice<Post> posts = postRepository.findByCursor(cursorCreatedAt, cursorId, pageable);
+        Slice<Post> posts = postRepository.findByCursor(cursorId, cursorCreatedAt, pageable);
 
+        return convertToSliceResponse(posts);
+    }
+
+    /**
+     * 응답 형태로 변환하는 메서드
+     * */
+    private SliceResponse<PostSummaryResponse> convertToSliceResponse(Slice<Post> posts) {
         // Entity -> DTO 변환
         List<PostSummaryResponse> content = posts.getContent().stream()
                 .map(this::toPostSummaryResponse)
                 .toList();
 
-        // 다음 커서 생성
-        SliceResponse.Cursor nextCursor = null;
-        if (posts.hasNext() && !content.isEmpty()) {
-            Post lastPost = posts.getContent().get(posts.getContent().size() - 1);
-            nextCursor = new SliceResponse.Cursor(
-                    lastPost.getId(),
-                    lastPost.getCreatedAt()
-            );
-        }
+        SliceResponse.Cursor nextCursor = createNewNextCursor(posts);
 
         return new SliceResponse<>(content, nextCursor, posts.hasNext());
+    }
+
+    /**
+     * 다음 커서 생성하는 메서드
+     * */
+    private SliceResponse.Cursor createNewNextCursor(Slice<Post> posts) {
+        if (!posts.hasNext() || posts.getContent().isEmpty()) {
+            return null;
+        }
+        Post lastPost = posts.getContent().get(posts.getContent().size() - 1);
+        return new SliceResponse.Cursor(
+                lastPost.getId(),
+                lastPost.getCreatedAt()
+        );
     }
 
     /**
@@ -104,8 +117,7 @@ public class PostService {
                         post.getPostContent().getPostImageKey()
                 ),
                 new PostDetailResponse.Author(
-                        post.getUser().getNickname(),
-                        post.getUser().getEmail()
+                        post.getUser().getNickname()
                 ),
                 new PostDetailResponse.Stats(
                         post.getLikeCount(),
@@ -132,7 +144,7 @@ public class PostService {
         PostContent postContent = PostContent.builder()
                 .post(post)
                 .content(HtmlUtils.htmlEscape(request.content()))
-                .postImageKey(request.profileImageKey())
+                .postImageKey(request.postImageKey())
                 .build();
 
         post.setPostContent(postContent);
@@ -191,8 +203,7 @@ public class PostService {
                         content.getPostImageKey()
                 ),
                 new PostResponse.Author(
-                        user.getNickname(),
-                        user.getEmail()
+                        user.getNickname()
                 )
         );
     }

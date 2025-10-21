@@ -1,4 +1,4 @@
-package com.vani.week4.backend.global;
+package com.vani.week4.backend.global.config;
 
 /**
  * @author vani

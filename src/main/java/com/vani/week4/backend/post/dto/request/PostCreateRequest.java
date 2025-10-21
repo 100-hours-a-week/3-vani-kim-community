@@ -16,6 +16,6 @@ public record PostCreateRequest (
     @Size(max = 10000, message = "내용은 최대 10000자입니다.")
     String content,
 
-    String profileImageKey
+    String postImageKey
 ) {}
 

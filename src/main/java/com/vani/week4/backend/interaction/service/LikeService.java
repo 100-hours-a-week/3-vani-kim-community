@@ -1,7 +1,6 @@
 package com.vani.week4.backend.interaction.service;
 
 import com.vani.week4.backend.global.exception.PostNotFoundException;
-import com.vani.week4.backend.interaction.dto.LikeResponse;
 import com.vani.week4.backend.interaction.entity.Like;
 import com.vani.week4.backend.interaction.entity.UserPostLikeId;
 import com.vani.week4.backend.interaction.repository.LikeRepository;
@@ -10,7 +9,6 @@ import com.vani.week4.backend.post.repository.PostRepository;
 import com.vani.week4.backend.user.entity.User;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

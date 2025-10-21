@@ -15,7 +15,7 @@ public record PostSummaryResponse (
 ) {
     public record Author (
         String name,
-        String email
+        String profileImageKey
     ) {}
     public record Stats(
             long likeCount,

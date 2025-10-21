@@ -59,7 +59,6 @@ public class AuthService {
         User user = User.createUser(
                 userId,
                 signUpRequest.nickname(),
-                signUpRequest.email(),
                 signUpRequest.profileImageKey()
                 );
         userRepository.save(user);

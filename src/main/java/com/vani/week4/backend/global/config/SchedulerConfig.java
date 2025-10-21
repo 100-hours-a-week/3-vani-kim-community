@@ -1,4 +1,4 @@
-package com.vani.week4.backend.global;
+package com.vani.week4.backend.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -39,9 +39,11 @@ public class User {
     private UserRole userRole;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default // 빌더는 필드에 값을 직접할당하는 초기화 구문 무시하므로  NULLPointer가능
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Like> likes = new ArrayList<>();
 
     private LocalDateTime createdAt;
@@ -50,7 +52,7 @@ public class User {
 
     protected User(){}
 
-    public static User createUser(String id, String nickname,String profileImageKey){
+    public static User createUser(String id, String nickname, String profileImageKey){
         return User.builder()
                 .id(id)
                 .nickname(nickname)

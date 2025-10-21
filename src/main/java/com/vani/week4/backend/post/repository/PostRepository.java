@@ -24,8 +24,8 @@ public interface PostRepository extends JpaRepository<Post, String> {
             "(p.createdAt = :cursorCreatedAt AND p.id < :cursorId)) " +
             "ORDER BY p.createdAt DESC, p.id DESC")
     Slice<Post> findByCursor(
-            @Param("cursorCreatedAt") LocalDateTime cursorCreatedAt,
             @Param("cursorId") String cursorId,
+            @Param("cursorCreatedAt") LocalDateTime cursorCreatedAt,
             Pageable pageable
     );
 

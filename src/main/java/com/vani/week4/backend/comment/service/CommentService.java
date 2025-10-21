@@ -70,7 +70,7 @@ public class CommentService {
             );
         }
 
-        return new SliceResponse(responses, nextCursor, topLevelComments.hasNext());
+        return new SliceResponse<CommentResponse>(responses, nextCursor, topLevelComments.hasNext());
     }
 
     /**comment 형태의 댓글을 CommentResponse의 형태로 변환하는 메서드,
