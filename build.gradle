@@ -14,9 +14,23 @@ java {
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+test {
+    useJUnitPlatform()
+    jvmArgs '-XX:+EnableDynamicAgentLoading'
+
+    testLogging {
+        // 개발 중에는 이 정도면 충분
+        events "passed", "failed"
+        exceptionFormat "full"
+        showStackTraces true
+
+        // 최종 요약
+        afterSuite { desc, result ->
+            if (!desc.parent) {
+                println "\n===== 테스트 결과 ====="
+                println "총 ${result.testCount}개 중 성공 ${result.successfulTestCount}개, 실패 ${result.failedTestCount}개"
+            }
+        }
     }
 }
 
@@ -35,13 +49,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'software.amazon.awssdk:s3:2.20.26'
     //implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation "io.jsonwebtoken:jjwt-api:0.11.5"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0"
     implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
-    implementation 'org.springframework.security:spring-security-crypto:5.7.1'
-    implementation 'io.github.cdimascio:dotenv-kotlin:6.4.1'
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
     compileOnly 'org.projectlombok:lombok'
@@ -52,6 +65,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:unchecked"
 }
