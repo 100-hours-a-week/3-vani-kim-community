@@ -20,13 +20,10 @@ spring:
       hibernate:
         format_sql: ture
 
-  logging:
-    level:
-      org:
-        springdoc: DEBUG
-        springframework:
-          web: DEBUG
-          security: TRACE
+logging:
+  level:
+    root: debug
+    com.vani.week4.backend: debug
 
 
 # === JWT: 시크릿과 토큰 만료 시간 설정

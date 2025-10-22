@@ -17,7 +17,8 @@ public record PostResponse(
             String content,
             String postImageKey
     ) {}
+    //TODO 유저 프로필 해결
     public record Author (
-            String name
+            String nickname
     ) {}
 }

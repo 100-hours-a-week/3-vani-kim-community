@@ -1,6 +1,9 @@
 package com.vani.week4.backend.user;
 
+import com.vani.week4.backend.user.dto.WithdrawRequest;
+import com.vani.week4.backend.auth.service.AuthService;
 import com.vani.week4.backend.global.CurrentUser;
+import com.vani.week4.backend.user.dto.PasswordUpdateRequest;
 import com.vani.week4.backend.user.dto.UserResponse;
 import com.vani.week4.backend.user.dto.UserUpdateRequest;
 import com.vani.week4.backend.user.entity.User;
@@ -21,8 +24,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-
-    // 생성과 삭제는 Auth에서 담당
+    private final AuthService authService;
+    //생성의 컨트롤러는 Auth의 회원가입과 통합되었음
 
     //회원 정보 조회
     @GetMapping("/me")
@@ -30,14 +33,37 @@ public class UserController {
         UserResponse userResponse = userService.getUserInfo(user);
         return ResponseEntity.ok(userResponse);
     }
+
+    // 회원 탈퇴
+    @PatchMapping("/me/withdraw")
+    public ResponseEntity<Void> withdrawUser(
+            @CurrentUser String userId,
+            @Valid @RequestBody WithdrawRequest request) {
+
+        userService.withdrawUser(userId, request);
+
+        return ResponseEntity.noContent().build();
+    }
+
     //회원정보 수정
     @PatchMapping("/me")
-    public ResponseEntity<UserResponse> updateCurrentUser(
+    public ResponseEntity<Void> updateCurrentUser(
             @CurrentUser User user,
             @Valid @RequestBody UserUpdateRequest request) {
 
-        UserResponse response = userService.updateUser(user, request);
+        userService.updateUser(user, request);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.noContent().build();
+    }
+
+    //비밀 번호 수정
+    @PatchMapping("/me/password")
+    public ResponseEntity<Void> updatePassword(
+            @CurrentUser User user,
+            @Valid @RequestBody PasswordUpdateRequest request) {
+
+        authService.updatePassword(user, request);
+
+        return ResponseEntity.noContent().build();
     }
 }

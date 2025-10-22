@@ -1,4 +1,4 @@
-package com.vani.week4.backend.auth.dto.request;
+package com.vani.week4.backend.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

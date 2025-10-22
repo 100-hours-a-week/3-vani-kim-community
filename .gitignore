@@ -45,3 +45,5 @@ out/
 ### Log ###
 *.log
 logs/
+
+*.rdb

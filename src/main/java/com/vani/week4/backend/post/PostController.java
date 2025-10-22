@@ -57,20 +57,20 @@ public class PostController {
 
     //게시글 생성
     @PostMapping()
-    public ResponseEntity<PostResponse> createPost(
+    public ResponseEntity<PostDetailResponse> createPost(
             @CurrentUser User user,
             @Valid @RequestBody PostCreateRequest request ) {
-        PostResponse response = postService.createPost(user, request);
+        PostDetailResponse response = postService.createPost(user, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     //게시글 수정
     @PatchMapping("/{postId}")
-    public ResponseEntity<PostResponse> updatePost(
+    public ResponseEntity<PostDetailResponse> updatePost(
             @CurrentUser User user,
             @PathVariable String postId,
             @Valid @RequestBody PostUpdateRequest request ) {
-        PostResponse response = postService.updatePost(user, postId, request);
+        PostDetailResponse response = postService.updatePost(user, postId, request);
         return ResponseEntity.ok(response);
     }
 

@@ -134,7 +134,7 @@ public class PostService {
      * @param request : dto
      * */
     @Transactional
-    public PostResponse createPost(User user, PostCreateRequest request){
+    public PostDetailResponse createPost(User user, PostCreateRequest request){
 
         Post post = Post.builder()
                 .id(UlidCreator.getUlid().toString())
@@ -152,7 +152,7 @@ public class PostService {
 
         postRepository.save(post);
 
-        return toPostResponse(post);
+        return toPostDetailResponse(post);
     }
 
     /**
@@ -162,7 +162,7 @@ public class PostService {
      * @param request : dto
      * */
     @Transactional
-    public PostResponse updatePost(User user, String postId, PostUpdateRequest request) {
+    public PostDetailResponse updatePost(User user, String postId, PostUpdateRequest request) {
         // 게시글 조회
         Post post = postRepository.findByIdWithContent(postId)
                 .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
@@ -188,23 +188,29 @@ public class PostService {
 
         post.updateModifiedDate();
 
-        return toPostResponse(post);
+        return toPostDetailResponse(post);
     }
 
-    private PostResponse toPostResponse(Post post) {
+    private PostDetailResponse toPostDetailResponse(Post post) {
         PostContent content = post.getPostContent();
         User user = post.getUser();
 
-        return new PostResponse(
+        return new PostDetailResponse(
                 post.getId(),
                 post.getTitle(),
                 post.getCreatedAt(),
-                new PostResponse.ContentDetail(
-                        content.getContent(),
-                        content.getPostImageKey()
+                post.getUpdatedAt(),
+                new PostDetailResponse.ContentDetail(
+                        post.getPostContent().getContent(),
+                        post.getPostContent().getPostImageKey()
                 ),
-                new PostResponse.Author(
-                        user.getNickname()
+                new PostDetailResponse.Author(
+                        post.getUser().getNickname()
+                ),
+                new PostDetailResponse.Stats(
+                        post.getLikeCount(),
+                        post.getCommentCount(),
+                        post.getViewCount()
                 )
         );
     }

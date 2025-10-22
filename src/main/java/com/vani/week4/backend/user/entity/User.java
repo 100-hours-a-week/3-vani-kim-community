@@ -74,5 +74,8 @@ public class User {
     public boolean isActive() {
         return this.userStatus == UserStatus.ACTIVE;
     }
+    public boolean isDeleted() {
+        return this.userStatus == UserStatus.DELETED;
+    }
 
 }

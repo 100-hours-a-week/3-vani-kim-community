@@ -52,28 +52,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    // 회원 탈퇴
-    @PatchMapping("/withdraw")
-    public ResponseEntity<Void> withdraw(
-            @CurrentUser String userId,
-            @Valid @RequestBody WithdrawRequest request) {
-
-        authService.withdraw(userId, request);
-        return ResponseEntity.noContent().build();
-    }
-
-    // TODO : 비밀번호 관련 로직
-    // 재설정
-    @PatchMapping("password")
-    public ResponseEntity<UserResponse> updateCurrentUser(
-            @CurrentUser User user,
-            @Valid @RequestBody UserUpdateRequest request) {
-
-        UserResponse response = userService.updateUser(user, request);
-
-        return ResponseEntity.ok(response);
-    }
-    // TODO : 이메일 중복 확인
+    //이메일 중복확인
     @GetMapping("/email")
     public ResponseEntity<Boolean> checkDuplicatedEmail(
             @Valid @RequestBody CheckEmailRequest request) {
@@ -81,6 +60,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.checkDuplicatedEmail(request));
     }
 
+    //닉네임 중복확인
     @GetMapping("/nickname")
     public ResponseEntity<Boolean> checkDuplicatedNickname(
             @Valid @RequestBody CheckNicknameRequest request) {
@@ -92,7 +72,4 @@ public class AuthController {
 //    @PostMapping("/email")
     // 발송
     // 확인
-
-
-
 }
