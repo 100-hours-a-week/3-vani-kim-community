@@ -1,5 +1,6 @@
 package com.vani.week4.backend.user.service;
 
+import com.vani.week4.backend.auth.dto.request.SignUpRequest;
 import com.vani.week4.backend.global.CurrentUser;
 import com.vani.week4.backend.user.dto.UserResponse;
 import com.vani.week4.backend.user.dto.UserUpdateRequest;
@@ -40,4 +41,14 @@ public class UserService {
         return UserResponse.of(user);
     }
 
+    @Transactional
+    public User createUser(String userId, SignUpRequest signUpRequest) {
+        User user = User.createUser(
+                userId,
+                signUpRequest.nickname(),
+                signUpRequest.profileImageKey()
+        );
+        userRepository.save(user);
+        return user;
+    }
 }

@@ -1,7 +1,5 @@
 package com.vani.week4.backend.auth.service;
-import com.vani.week4.backend.auth.dto.request.LoginRequest;
-import com.vani.week4.backend.auth.dto.request.SignUpRequest;
-import com.vani.week4.backend.auth.dto.request.WithdrawRequest;
+import com.vani.week4.backend.auth.dto.request.*;
 import com.vani.week4.backend.auth.dto.response.LoginResponse;
 import com.vani.week4.backend.auth.dto.response.TokenResponse;
 import com.vani.week4.backend.auth.dto.response.SignUpResponse;
@@ -14,6 +12,7 @@ import com.vani.week4.backend.global.exception.*;
 import com.vani.week4.backend.user.entity.User;
 import com.vani.week4.backend.user.entity.UserStatus;
 import com.vani.week4.backend.user.repository.UserRepository;
+import com.vani.week4.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,7 @@ import com.github.f4b6a3.ulid.UlidCreator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Duration;
+import java.util.Optional;
 
 /**
  * @author vani
@@ -38,7 +38,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String,String> redisTemplate;
-
+    private final UserService userService;
     /**
      * 회원가입을 진행하는 메서드
      * @return : 인증용 토큰 발급
@@ -47,23 +47,10 @@ public class AuthService {
     // TODO : OAUTH, 소셜로그인 도입
     @Transactional
     public SignUpResponse signUp(SignUpRequest signUpRequest){
-
-        if (authRepository.existsByEmail(signUpRequest.email())) {
-            throw new EmailAlreadyExistsException(ErrorCode.RESOURCE_CONFLICT);
-        }
-        if (userRepository.existsByNickname(signUpRequest.nickname())) {
-            throw new NicknameAlreadyExistsException(ErrorCode.RESOURCE_CONFLICT);
-        }
-
         // User 생성 요청
         String userId = UlidCreator.getUlid().toString();
-        User user = User.createUser(
-                userId,
-                signUpRequest.nickname(),
-                signUpRequest.profileImageKey()
-                );
-        userRepository.save(user);
 
+        User user = userService.create(userId, signUpRequest);
 
         //Auth 생성 요청
         Auth auth = Auth.ceateAuth(
@@ -175,5 +162,13 @@ public class AuthService {
         }
         user.updateUserStatus(UserStatus.DELETED);
 
+    }
+
+    public boolean checkDuplicatedEmail(CheckEmailRequest request){
+        return authRepository.existsByEmail(request.email());
+    }
+
+    public boolean checkDuplicatedNickname(CheckNicknameRequest request){
+        return userRepository.existsByNickname(request.nickname());
     }
 }

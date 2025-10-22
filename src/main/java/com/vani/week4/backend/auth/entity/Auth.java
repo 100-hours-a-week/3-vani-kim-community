@@ -26,7 +26,6 @@ public class Auth {
     @Column(length = 300)
     private String email;
 
-
     @Column(length = 10)
     private ProviderType provider;
 
