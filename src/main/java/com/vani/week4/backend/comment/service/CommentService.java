@@ -7,6 +7,7 @@ import com.vani.week4.backend.comment.dto.CommentUpdateRequest;
 import com.vani.week4.backend.comment.dto.CommentUpdateResponse;
 import com.vani.week4.backend.comment.entity.Comment;
 import com.vani.week4.backend.comment.repository.CommentRepository;
+import com.vani.week4.backend.global.ErrorCode;
 import com.vani.week4.backend.global.dto.SliceResponse;
 import com.vani.week4.backend.global.exception.*;
 import com.vani.week4.backend.post.entity.Post;
@@ -47,7 +48,7 @@ public class CommentService {
             int size ) {
 
         postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
         //정렬된 최상위(최신 작성, id큰 순) 댓글들 가져오기
         Pageable pageable = PageRequest.of(0, size);
@@ -151,7 +152,7 @@ public class CommentService {
     public CommentResponse createComment(String postId, User user, CommentCreateRequest request){
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
         String commentId = UlidCreator.getUlid().toString();
 
@@ -161,17 +162,17 @@ public class CommentService {
         Comment parent = null;
         if (request.parentId() != null){
             parent = commentRepository.findById(request.parentId())
-                    .orElseThrow(() -> new CommentNotFoundException("댓글을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new CommentNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
             //악의적인 오류 유발 댓글 방지
             if(!parent.getId().equals(post.getId())){
-                throw new InvalidCommentException("다른 게시글에 댓글에 답글을 달 수 업습니다.");
+                throw new InvalidCommentException(ErrorCode.INVALID_INPUT);
             }
 
             //댓글 깊이 제한
             //TODO 깊이 제한을 어디까지 할것인지 확인 필요
             if(parent.getDepth() >= 3) {
-                throw new MaxDepthExceededException("최대 4 단계까지 답글 가능합니다.");
+                throw new MaxDepthExceededException(ErrorCode.INVALID_INPUT);
             }
         }
 
@@ -214,13 +215,13 @@ public class CommentService {
     public CommentUpdateResponse updateComment(String postId, String commentId,User user, CommentUpdateRequest request){
 
         postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException("댓글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CommentNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!comment.getUser().getId().equals(user.getId())) {
-            throw new UnauthorizedException("댓글 수정 권한이 없습니다.");
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
         }
 
         comment.updateContent(HtmlUtils.htmlEscape(request.content()));
@@ -240,13 +241,13 @@ public class CommentService {
     @Transactional
     public void deleteComment(String postId, String commentId, User user){
         postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException("댓글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CommentNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!comment.getUser().getId().equals(user.getId())) {
-            throw new UnauthorizedException("댓글 삭제 권한이 없습니다.");
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
         }
         commentRepository.delete(comment);
     }

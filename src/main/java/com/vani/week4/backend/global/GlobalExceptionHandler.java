@@ -1,6 +1,7 @@
 package com.vani.week4.backend.global;
 
 import com.vani.week4.backend.global.exception.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * @author vani
  * @since 10/13/25
  */
+@Slf4j      // 로거 이용하기
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -19,76 +21,135 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleEmailAlreadyExists(EmailAlreadyExistsException ex){
-        ErrorResponse response = new ErrorResponse("EMAIL_DUPLICATED", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(NicknameAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleNicknameAlreadyExists(NicknameAlreadyExistsException ex){
-        ErrorResponse response = new ErrorResponse("NICKNAME_DUPLICATED", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex){
-        ErrorResponse response = new ErrorResponse("USER_NOT_FOUND", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(InvalidPasswordException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidPassword(InvalidPasswordException ex){
-        ErrorResponse response = new ErrorResponse("INVALID_PASSWORD", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(UserAccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleUserAccessDenied(UserAccessDeniedException ex){
-        ErrorResponse response = new ErrorResponse("ACCESS_DENIED", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-    }
-
     @ExceptionHandler(AuthNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleAuthNotFound(AuthNotFoundException ex){
-        ErrorResponse response = new ErrorResponse("AUTH_NOT_FOUND", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-    }
+        ErrorCode code = ex.getErrorCode();
 
-    @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidToken(InvalidTokenException ex){
-        ErrorResponse response = new ErrorResponse("INVALID_TOKEN", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-    }
+        // Enum 이용하기
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
 
-    @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handlePostNotFound(PostNotFoundException ex){
-        ErrorResponse response = new ErrorResponse("POST_NOT_FOUND", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
+        log.warn("권한 없는 접근 발생: code={}, msg={}", code.getMessage(), ex.getMessage());
 
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException ex){
-        ErrorResponse response = new ErrorResponse("UNAUTHORIZED", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(response, code.getStatus());
     }
 
     @ExceptionHandler(CommentNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleCommentNotFound(CommentNotFoundException ex){
-        ErrorResponse response = new ErrorResponse("COMMENT_NOT_FOUND", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("존재하지 않는 댓글 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyExists(EmailAlreadyExistsException ex){
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("이미 존재하는 이메일 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
     }
 
     @ExceptionHandler(InvalidCommentException.class)
     public ResponseEntity<ErrorResponse> handleInvalidComment(InvalidCommentException ex){
-        ErrorResponse response = new ErrorResponse("INVALID_COMMENT", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("잘못된 댓글 요청 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPassword(InvalidPasswordException ex){
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("유효하지 않은 비밀번호 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidToken(InvalidTokenException ex){
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("유효하지 않은 토큰 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
     }
 
     @ExceptionHandler(MaxDepthExceededException.class)
     public ResponseEntity<ErrorResponse> handleMaxDepthExceeded(MaxDepthExceededException ex){
-        ErrorResponse response = new ErrorResponse("MAX_DEPTH_EXCEEDED", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("댓글 깊이 초과 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
     }
 
+    @ExceptionHandler(NicknameAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleNicknameAlreadyExists(NicknameAlreadyExistsException ex){
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("이미 존재하는 이메일 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
+
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePostNotFound(PostNotFoundException ex){
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("존재하지 않는 게시글 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException ex){
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("권한 없는 접근 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
+    @ExceptionHandler(UserAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleUserAccessDenied(UserAccessDeniedException ex){
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("유저 접근 거부 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex){
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("존재하지 않는 유저 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
 }

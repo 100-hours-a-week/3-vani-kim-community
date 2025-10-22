@@ -1,5 +1,6 @@
 package com.vani.week4.backend.auth.security;
 
+import com.vani.week4.backend.global.ErrorCode;
 import com.vani.week4.backend.global.exception.UserNotFoundException;
 import com.vani.week4.backend.user.entity.User;
 import com.vani.week4.backend.user.repository.UserRepository;
@@ -48,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String userId = jwtTokenProvider.getUserIdFromToken(token);
 
             User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+                    .orElseThrow(() -> new UserNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
             UserPrincipal userPrincipal = new UserPrincipal(user);
 

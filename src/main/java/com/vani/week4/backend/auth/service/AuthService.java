@@ -9,6 +9,7 @@ import com.vani.week4.backend.auth.entity.Auth;
 import com.vani.week4.backend.auth.entity.ProviderType;
 import com.vani.week4.backend.auth.repository.AuthRepository;
 import com.vani.week4.backend.auth.security.JwtTokenProvider;
+import com.vani.week4.backend.global.ErrorCode;
 import com.vani.week4.backend.global.exception.*;
 import com.vani.week4.backend.user.entity.User;
 import com.vani.week4.backend.user.entity.UserStatus;
@@ -48,10 +49,10 @@ public class AuthService {
     public SignUpResponse signUp(SignUpRequest signUpRequest){
 
         if (authRepository.existsByEmail(signUpRequest.email())) {
-            throw new EmailAlreadyExistsException("이미 사용 중인 이메일입니다.");
+            throw new EmailAlreadyExistsException(ErrorCode.RESOURCE_CONFLICT);
         }
         if (userRepository.existsByNickname(signUpRequest.nickname())) {
-            throw new NicknameAlreadyExistsException("이미 사용 중인 닉네임입니다.");
+            throw new NicknameAlreadyExistsException(ErrorCode.RESOURCE_CONFLICT);
         }
 
         // User 생성 요청
@@ -94,9 +95,9 @@ public class AuthService {
     public LoginResponse login(LoginRequest request) {
 
         Auth auth = authRepository.findByEmail(request.email())
-                .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
         if (!passwordEncoder.matches(request.password(), auth.getPasswordHash())){
-            throw new InvalidPasswordException("이메일 또는 비밀번호가 올바르지 않습니다.");
+            throw new InvalidPasswordException(ErrorCode.RESOURCE_CONFLICT);
         }
         User user = auth.getUser();
         if(user == null){
@@ -104,7 +105,7 @@ public class AuthService {
         }
 
         if (!user.isActive()) {
-            throw new UserAccessDeniedException("로그인할 수 없는 계정입니다.");
+            throw new UserAccessDeniedException(ErrorCode.FORBIDDEN);
         }
 
         String userId = user.getId();
@@ -128,7 +129,7 @@ public class AuthService {
     public TokenResponse reissueTokens(String refreshToken) {
         //토큰 자체 유효성 검사
         if (!jwtTokenProvider.validateToken(refreshToken)){
-            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
+            throw new InvalidTokenException(ErrorCode.RESOURCE_CONFLICT);
         }
 
         String userId = jwtTokenProvider.getUserIdFromToken(refreshToken);
@@ -136,7 +137,7 @@ public class AuthService {
         //레디스에서 리프레시 토큰 조회
         String storedRefreshToken = redisTemplate.opsForValue().get(userId);
         if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
-            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
+            throw new InvalidTokenException(ErrorCode.RESOURCE_CONFLICT);
         }
         //새 토큰 발급
         String newAccessToken = jwtTokenProvider.generateAccessToken(userId);
@@ -160,13 +161,13 @@ public class AuthService {
     @Transactional
     public void withdraw(String userId, WithdrawRequest request){
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("해당 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
         Auth auth = authRepository.findByUserAndProvider(user, ProviderType.LOCAL)
-                .orElseThrow(() -> new AuthNotFoundException("비밀번호 인증 정보가 없는 유저입니다."));
+                .orElseThrow(() -> new AuthNotFoundException(ErrorCode.UNAUTHORIZED));
 
         if (!passwordEncoder.matches(request.password(), auth.getPasswordHash())) {
-            throw new InvalidPasswordException("이메일 또는 비밀번호가 올바르지 않습니다.");
+            throw new InvalidPasswordException(ErrorCode.RESOURCE_CONFLICT);
         }
 
         if(user == null){

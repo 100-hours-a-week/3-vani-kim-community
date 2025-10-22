@@ -1,5 +1,6 @@
 package com.vani.week4.backend.interaction.service;
 
+import com.vani.week4.backend.global.ErrorCode;
 import com.vani.week4.backend.global.exception.PostNotFoundException;
 import com.vani.week4.backend.interaction.entity.Like;
 import com.vani.week4.backend.interaction.entity.UserPostLikeId;
@@ -30,7 +31,7 @@ public class LikeService {
         String userId = user.getId();
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
         //이미 좋아요 했다면 삭제, 안했으면 좋아요
         //레디스에 카운트 캐싱

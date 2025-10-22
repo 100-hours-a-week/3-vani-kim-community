@@ -1,6 +1,7 @@
 package com.vani.week4.backend.post.service;
 
 import com.github.f4b6a3.ulid.UlidCreator;
+import com.vani.week4.backend.global.ErrorCode;
 import com.vani.week4.backend.global.exception.PostNotFoundException;
 import com.vani.week4.backend.global.exception.UnauthorizedException;
 import com.vani.week4.backend.post.dto.request.PostCreateRequest;
@@ -104,7 +105,7 @@ public class PostService {
      * */
     public PostDetailResponse getPostDetail(String postId){
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
         //TODO Count 로직 개선 필요
         post.incrementViewCount();
         return new PostDetailResponse(
@@ -164,11 +165,11 @@ public class PostService {
     public PostResponse updatePost(User user, String postId, PostUpdateRequest request) {
         // 게시글 조회
         Post post = postRepository.findByIdWithContent(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
         // 권한 확인
         if (!post.getUser().getId().equals(user.getId())) {
-            throw new UnauthorizedException("게시글 수정 권한이 없습니다.");
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
         }
 
         // 제목 수정 (null이 아닐 때만)
@@ -214,10 +215,10 @@ public class PostService {
     @Transactional
     public void deletePost(User user, String postId) {
         Post post = postRepository.findByIdWithContent(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
         if (!post.getUser().getId().equals(user.getId())) {
-            throw new UnauthorizedException("게시글 수정 권한이 없습니다.");
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED);
         }
 
         postRepository.delete(post);

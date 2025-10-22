@@ -1,11 +1,20 @@
 package com.vani.week4.backend.global.exception;
 
+import com.vani.week4.backend.global.ErrorCode;
+import lombok.Getter;
+
 /**
  * @author vani
  * @since 10/13/25
  */
+@Getter
 public class AuthNotFoundException extends RuntimeException{
-    public AuthNotFoundException(String message) {
-        super(message);
+
+    private final ErrorCode errorCode;
+
+    public AuthNotFoundException(ErrorCode errorCode) {
+
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
 }
