@@ -53,6 +53,8 @@ public class SecurityConfig {
                         .requestMatchers("/auth/users").permitAll()
                         .requestMatchers("/auth/tokens").permitAll()
                         .requestMatchers("/auth/refresh").permitAll()
+                        .requestMatchers("/auth/nickname").permitAll()
+                        .requestMatchers("/auth/email").permitAll()
                         .requestMatchers(
                                 "/",                          // 루트 경로 허용
                                 "/swagger-ui.html",           // Swagger UI 페이지

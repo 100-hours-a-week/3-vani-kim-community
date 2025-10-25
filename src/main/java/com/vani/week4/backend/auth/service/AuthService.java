@@ -45,6 +45,7 @@ public class AuthService {
      * @return : 인증용 토큰 발급
      * */
     // TODO : OAUTH, 소셜로그인 도입
+    // TODO : local로 가입시 중복이메일 확인 내부로직
     @Transactional
     public SignUpResponse signUp(SignUpRequest signUpRequest){
         // User 생성 요청
@@ -99,15 +100,16 @@ public class AuthService {
         }
 
         String userId = user.getId();
-
+        String nickname = user.getNickname();
         //토큰생성
         String accessToken = jwtTokenProvider.generateAccessToken(userId);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
-
+        //TODO 유저 다 반환하는건 좀 위험해 보인다..
         // 최종 응답 DTO 반환
         return LoginResponse.of(
                 accessToken,
-                refreshToken
+                refreshToken,
+                nickname
         );
     }
 
@@ -142,12 +144,18 @@ public class AuthService {
         return new TokenResponse(newAccessToken, newRefreshToken);
     }
 
-    public boolean checkDuplicatedEmail(CheckEmailRequest request){
-        return authRepository.existsByEmail(request.email());
+    public void checkDuplicatedEmail(CheckEmailRequest request){
+        Boolean isDuplicated = authRepository.existsByEmail(request.email());
+        if(isDuplicated) {
+            throw new EmailAlreadyExistsException(ErrorCode.RESOURCE_CONFLICT);
+        }
     }
 
-    public boolean checkDuplicatedNickname(CheckNicknameRequest request){
-        return userRepository.existsByNickname(request.nickname());
+    public void checkDuplicatedNickname(CheckNicknameRequest request){
+        Boolean isDuplicated = userRepository.existsByNickname(request.nickname());
+        if(isDuplicated) {
+            throw new NicknameAlreadyExistsException(ErrorCode.RESOURCE_CONFLICT);
+        }
     }
 
     public boolean checkPassword(User user, String password){

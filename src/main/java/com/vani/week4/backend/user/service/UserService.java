@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final AuthService authService;
-
     //순환참조 해결용
     public UserService(
             UserRepository userRepository,
@@ -36,12 +35,9 @@ public class UserService {
         this.userRepository = userRepository;
         this.authService = authService;
     }
-
+    //TODO 테이블 수정 필요 User-UserAuth 이메일....
     public UserResponse getUserInfo(User user) {
-        return UserResponse.builder()
-                .nickname(user.getNickname())
-                .profileImageKey(user.getProfileImageKey())
-                .build();
+        return new UserResponse(user.getNickname(), user.getProfileImageKey());
     }
 
     @Transactional

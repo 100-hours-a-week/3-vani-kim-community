@@ -54,18 +54,18 @@ public class AuthController {
 
     //이메일 중복확인
     @GetMapping("/email")
-    public ResponseEntity<Boolean> checkDuplicatedEmail(
-            @Valid @RequestBody CheckEmailRequest request) {
-
-        return ResponseEntity.ok(authService.checkDuplicatedEmail(request));
+    public ResponseEntity<?> checkDuplicatedEmail(
+            @Valid CheckEmailRequest request) {
+         authService.checkDuplicatedEmail(request);
+        return ResponseEntity.ok("사용 가능한 이메일입니다.");
     }
 
     //닉네임 중복확인
     @GetMapping("/nickname")
-    public ResponseEntity<Boolean> checkDuplicatedNickname(
-            @Valid @RequestBody CheckNicknameRequest request) {
-
-        return ResponseEntity.ok( authService.checkDuplicatedNickname(request));
+    public ResponseEntity<?> checkDuplicatedNickname(
+            @Valid CheckNicknameRequest request) {
+        authService.checkDuplicatedNickname(request);
+        return ResponseEntity.ok("사용 가능한 닉네임입니다.");
     }
 
     // TODO : 이메일 인증
