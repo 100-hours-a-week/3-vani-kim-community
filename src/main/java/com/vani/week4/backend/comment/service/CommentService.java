@@ -104,7 +104,6 @@ public class CommentService {
     //dto 변환 헬퍼메서드
     private CommentResponse.Author toAuthor(User user) {
         return new CommentResponse.Author(
-                user.getId(),
                 user.getNickname(),
                 user.getProfileImageKey()
         );
@@ -160,8 +159,8 @@ public class CommentService {
 
         // 대댓글인지 검증
         Comment parent = null;
-        if (request.parentId() != null){
-            parent = commentRepository.findById(request.parentId())
+        if (request.parentId().isPresent()){
+            parent = commentRepository.findById(request.parentId().get())
                     .orElseThrow(() -> new CommentNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
             //악의적인 오류 유발 댓글 방지
@@ -180,7 +179,7 @@ public class CommentService {
                 .id(commentId)
                 .user(user)
                 .post(post)
-                .parentId(request.parentId())
+                .parentId(request.parentId().orElse(null))
                 .depth(parent == null ? 0 : parent.getDepth() + 1)
                 .commentGroup(parent == null ? commentId : parent.getCommentGroup())
                 .content(safeContent)

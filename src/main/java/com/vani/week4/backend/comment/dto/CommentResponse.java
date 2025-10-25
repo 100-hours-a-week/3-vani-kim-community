@@ -10,7 +10,7 @@ import java.util.List;
 public record CommentResponse(
         String commentId,
         String parentId,
-        String Content,
+        String content,
         String commentGroup,
         LocalDateTime createdAt,
         Integer depth,
@@ -24,8 +24,7 @@ public record CommentResponse(
 
 ) {
     public record Author (
-            String nickName,
-            String email,
+            String nickname,
             String profileImageKey
     ) {}
 }

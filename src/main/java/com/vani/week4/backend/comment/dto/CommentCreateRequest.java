@@ -3,6 +3,8 @@ package com.vani.week4.backend.comment.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.Optional;
+
 /**
  * @author vani
  * @since 10/15/25
@@ -12,6 +14,6 @@ public record CommentCreateRequest(
         @Size(min = 1, max = 1000, message = "댓글은 1-1000자 시이여야합니다.")
         String content,
 
-        String parentId
+        Optional<String> parentId
 ) {
 }

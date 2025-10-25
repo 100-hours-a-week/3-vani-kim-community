@@ -20,7 +20,7 @@ public record PostDetailResponse (
             String postImageKey
     ) {}
     public record Author (
-            String name
+            String nickname
     ) {}
     public record Stats(
             long likeCount,
