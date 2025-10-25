@@ -41,6 +41,6 @@ cloud:
     region:
       static: ap-northeast-2
     s3:
-      bucket: test-bucket
+      bucket: vani-main-bucket
     stack:
       auto: false
