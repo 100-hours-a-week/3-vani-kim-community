@@ -1,0 +1,19 @@
+.terms-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    line-height: 1.7; /* 가독성을 위한 줄 간격 */
+}
+.terms-content h3 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+.terms-content p, .terms-content li {
+    font-size: 15px;
+    color: #333;
+}
+.terms-content ol {
+    padding-left: 20px;
+}
