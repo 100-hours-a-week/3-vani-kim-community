@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.*;
-
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest; // 👈 1. 임포트
 import java.util.List;
 
 /**
@@ -49,12 +49,16 @@ public class SecurityConfig {
 
                 //url별 권한 설정
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+
+                        // 3. 에러 페이지 허용 (필수)
+                        .requestMatchers("/error").permitAll()
+
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/users").permitAll()
-                        .requestMatchers("/auth/tokens").permitAll()
-                        .requestMatchers("/auth/refresh").permitAll()
-                        .requestMatchers("/auth/nickname").permitAll()
-                        .requestMatchers("/auth/email").permitAll()
+                        .requestMatchers("/auth/users", "/auth/tokens", "/auth/refresh", "/auth/nickname","/auth/email").permitAll()
+                        .requestMatchers("/api/v1/uploads/presign/temp").permitAll()
+                        .requestMatchers("/terms-of-service").permitAll()
+                        .requestMatchers("/privacy-policy").permitAll()
                         .requestMatchers(
                                 "/",                          // 루트 경로 허용
                                 "/swagger-ui.html",           // Swagger UI 페이지
@@ -63,6 +67,11 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/index")
+                        .permitAll()
                 )
 
                 .addFilterBefore(jwtAuthenticationFilter,
