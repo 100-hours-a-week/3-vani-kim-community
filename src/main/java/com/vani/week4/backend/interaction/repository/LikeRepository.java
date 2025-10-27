@@ -14,4 +14,6 @@ public interface LikeRepository extends JpaRepository<Like, UserPostLikeId> {
     // 좋아요 존재 여부 확인
     boolean existsById(UserPostLikeId id);
 
+    boolean existsByUserIdAndPostId(String userId, String postId);
+
 }

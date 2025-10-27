@@ -4,6 +4,7 @@ import com.github.f4b6a3.ulid.UlidCreator;
 import com.vani.week4.backend.global.ErrorCode;
 import com.vani.week4.backend.global.exception.PostNotFoundException;
 import com.vani.week4.backend.global.exception.UnauthorizedException;
+import com.vani.week4.backend.interaction.repository.LikeRepository;
 import com.vani.week4.backend.post.dto.request.PostCreateRequest;
 import com.vani.week4.backend.post.dto.request.PostUpdateRequest;
 import com.vani.week4.backend.post.dto.response.PostDetailResponse;
@@ -33,6 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final LikeRepository likeRepository;
     /**
      * 게시글 목록 커서 페이징을 위한 메서드, 생성일자와 Id 기준으로 내림차순
      * @param cursorId : 커서 페이징을 위한 postId
@@ -103,29 +105,13 @@ public class PostService {
      * 게시글 id를 이용하여 게시글 상세 정보를 불러 오는 메서드
      * @param postId : 게시글 아이디
      * */
-    public PostDetailResponse getPostDetail(String postId){
+    public PostDetailResponse getPostDetail(String postId, User currentUser) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
         //TODO Count 로직 개선 필요
         post.incrementViewCount();
-        return new PostDetailResponse(
-                post.getId(),
-                post.getTitle(),
-                post.getCreatedAt(),
-                post.getUpdatedAt(),
-                new PostDetailResponse.ContentDetail(
-                        post.getPostContent().getContent(),
-                        post.getPostContent().getPostImageKey()
-                ),
-                new PostDetailResponse.Author(
-                        post.getUser().getNickname()
-                ),
-                new PostDetailResponse.Stats(
-                        post.getLikeCount(),
-                        post.getCommentCount(),
-                        post.getViewCount()
-                )
-            );
+        Boolean isLiked = likeRepository.existsByUserIdAndPostId(currentUser.getId(), postId);
+        return toPostDetailResponse(post, isLiked);
     }
 
     /**
@@ -152,7 +138,7 @@ public class PostService {
 
         postRepository.save(post);
 
-        return toPostDetailResponse(post);
+        return toPostDetailResponse(post, false);
     }
 
     /**
@@ -187,11 +173,12 @@ public class PostService {
         }
 
         post.updateModifiedDate();
+        Boolean isLiked = likeRepository.existsByUserIdAndPostId(user.getId(), postId);
 
-        return toPostDetailResponse(post);
+        return toPostDetailResponse(post, isLiked);
     }
 
-    private PostDetailResponse toPostDetailResponse(Post post) {
+    private PostDetailResponse toPostDetailResponse(Post post, Boolean isLiked) {
         PostContent content = post.getPostContent();
         User user = post.getUser();
 
@@ -210,7 +197,8 @@ public class PostService {
                 new PostDetailResponse.Stats(
                         post.getLikeCount(),
                         post.getCommentCount(),
-                        post.getViewCount()
+                        post.getViewCount(),
+                        isLiked
                 )
         );
     }

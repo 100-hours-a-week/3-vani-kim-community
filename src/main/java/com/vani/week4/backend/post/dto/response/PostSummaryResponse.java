@@ -14,7 +14,7 @@ public record PostSummaryResponse (
     Stats stats
 ) {
     public record Author (
-        String name,
+        String nickname,
         String profileImageKey
     ) {}
     public record Stats(
