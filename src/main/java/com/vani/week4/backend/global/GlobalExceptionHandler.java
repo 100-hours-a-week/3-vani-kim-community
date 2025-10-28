@@ -55,6 +55,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, code.getStatus());
     }
 
+    @ExceptionHandler(FileSizeExceedException.class)
+    public ResponseEntity<ErrorResponse> handleFileSizeExceed(FileSizeExceedException ex){
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("요청 파일 사이즈 규격 초과 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
+
     @ExceptionHandler(InvalidCommentException.class)
     public ResponseEntity<ErrorResponse> handleInvalidComment(InvalidCommentException ex){
         ErrorCode code = ex.getErrorCode();
@@ -62,6 +73,17 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
 
         log.warn("잘못된 댓글 요청 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
+
+    @ExceptionHandler(InvalidContentTypeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidContentType(InvalidContentTypeException ex){
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("허용되지 않는 컨첸트 타입 : code={}, msg={}", code.getMessage(), ex.getMessage());
 
         return new ResponseEntity<>(response, code.getStatus());
     }

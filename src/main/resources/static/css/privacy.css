@@ -1,0 +1,35 @@
+
+.terms-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    line-height: 1.7;
+}
+.terms-content h3 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+.terms-content p, .terms-content li, .terms-content th, .terms-content td {
+    font-size: 15px;
+    color: #333;
+}
+.terms-content ol {
+    padding-left: 20px;
+}
+/* 위탁 테이블용 스타일 */
+.terms-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    border: 1px solid #ddd;
+}
+.terms-content th, .terms-content td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+.terms-content th {
+    background-color: #f9f9f9;
+}

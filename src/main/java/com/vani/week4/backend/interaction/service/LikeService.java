@@ -24,7 +24,7 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
     private final RedisTemplate<String, Object> redisTemplateForCount;
-
+    //TODO 레디스와 DB 동기화 오류 문제 있음 캐시가 비었을 경우 다시 DB에서 가져와서 쓰는 로직이 없음
     @Transactional
     public void toggleLike(User user, String postId){
 

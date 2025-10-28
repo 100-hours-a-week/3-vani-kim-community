@@ -50,8 +50,11 @@ public class PostController {
 
     //게시글 상세 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDetailResponse> getPost(@PathVariable("postId") String postId){
-        PostDetailResponse response = postService.getPostDetail(postId);
+    public ResponseEntity<PostDetailResponse> getPost(
+            @PathVariable("postId") String postId,
+            @CurrentUser User user
+    ){
+        PostDetailResponse response = postService.getPostDetail(postId, user);
         return ResponseEntity.ok(response);
     }
 

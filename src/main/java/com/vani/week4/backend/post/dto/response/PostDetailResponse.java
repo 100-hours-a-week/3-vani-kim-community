@@ -25,6 +25,7 @@ public record PostDetailResponse (
     public record Stats(
             long likeCount,
             long commentCount,
-            long viewCount
+            long viewCount,
+            boolean isLiked
     ) {}
 }
