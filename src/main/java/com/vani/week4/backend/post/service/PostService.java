@@ -201,11 +201,11 @@ public class PostService {
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
                 new PostDetailResponse.ContentDetail(
-                        post.getPostContent().getContent(),
-                        post.getPostContent().getPostImageKey()
+                        content.getContent(),
+                        content.getPostImageKey()
                 ),
                 new PostDetailResponse.Author(
-                        post.getUser().getNickname()
+                        user.getNickname()
                 ),
                 new PostDetailResponse.Stats(
                         post.getLikeCount(),

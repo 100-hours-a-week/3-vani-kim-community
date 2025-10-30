@@ -1,12 +1,12 @@
 package com.vani.week4.backend.auth.service;
+import com.vani.week4.backend.auth.SessionStore;
 import com.vani.week4.backend.auth.dto.request.*;
 import com.vani.week4.backend.auth.dto.response.LoginResponse;
-import com.vani.week4.backend.auth.dto.response.TokenResponse;
 import com.vani.week4.backend.auth.dto.response.SignUpResponse;
 import com.vani.week4.backend.auth.entity.Auth;
 import com.vani.week4.backend.auth.entity.ProviderType;
 import com.vani.week4.backend.auth.repository.AuthRepository;
-import com.vani.week4.backend.auth.security.JwtTokenProvider;
+//import com.vani.week4.backend.auth.security.JwtTokenProvider;
 import com.vani.week4.backend.global.ErrorCode;
 import com.vani.week4.backend.global.exception.*;
 import com.vani.week4.backend.user.dto.PasswordUpdateRequest;
@@ -15,14 +15,10 @@ import com.vani.week4.backend.user.entity.UserStatus;
 import com.vani.week4.backend.user.repository.UserRepository;
 import com.vani.week4.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.github.f4b6a3.ulid.UlidCreator;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.time.Duration;
-import java.util.Optional;
 
 /**
  * @author vani
@@ -35,11 +31,9 @@ public class AuthService {
 
     private final AuthRepository authRepository;
     private final UserRepository userRepository;
-//    private final UserInternalApiClient userApiClient;
-    private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
-    private final RedisTemplate<String,String> redisTemplate;
     private final UserService userService;
+    private final SessionStore sessionStore;
     /**
      * 회원가입을 진행하는 메서드
      * @return : 인증용 토큰 발급
@@ -63,22 +57,13 @@ public class AuthService {
         );
         authRepository.save(auth);
 
-        //토큰생성
-        String accessToken = jwtTokenProvider.generateAccessToken(userId);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
-
-        return SignUpResponse.of(
-                userId,
-                accessToken,
-                refreshToken
-        );
+        return new SignUpResponse(userId);
     }
 
     /**
      * 로그인 로직
-     * @return : 인증용 토큰 발급
+     * @return : 세션아이디와 닉네임
      * */
-    // TODO : 삭제 후 재로그인 전략 필요
     @Transactional
     public LoginResponse login(LoginRequest request) {
 
@@ -101,58 +86,29 @@ public class AuthService {
 
         String userId = user.getId();
         String nickname = user.getNickname();
-        //토큰생성
-        String accessToken = jwtTokenProvider.generateAccessToken(userId);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
-        //TODO 유저 다 반환하는건 좀 위험해 보인다..
-        // 최종 응답 DTO 반환
-        return LoginResponse.of(
-                accessToken,
-                refreshToken,
-                nickname
-        );
+        //세션 ID 생성
+        String sessionId = UlidCreator.getUlid().toString();
+        sessionStore.saveSessionId(sessionId, userId);
+
+        return new LoginResponse( sessionId, nickname );
     }
 
-    /**
-     * refresh토큰을 이용하여 access토큰을 재발급 하는 메서드
-     * */
-    // TODO : 토큰 블랙리스트 필요
     @Transactional
-    public TokenResponse reissueTokens(String refreshToken) {
-        //토큰 자체 유효성 검사
-        if (!jwtTokenProvider.validateToken(refreshToken)){
-            throw new InvalidTokenException(ErrorCode.RESOURCE_CONFLICT);
-        }
+    public void logout(String sessionId){
+        sessionStore.removeSessionId(sessionId);
 
-        String userId = jwtTokenProvider.getUserIdFromToken(refreshToken);
 
-        //레디스에서 리프레시 토큰 조회
-        String storedRefreshToken = redisTemplate.opsForValue().get(userId);
-        if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
-            throw new InvalidTokenException(ErrorCode.RESOURCE_CONFLICT);
-        }
-        //새 토큰 발급
-        String newAccessToken = jwtTokenProvider.generateAccessToken(userId);
-        String newRefreshToken = jwtTokenProvider.generateRefreshToken(userId);
-
-        //레디스 갱신
-        redisTemplate.opsForValue().set(
-                userId,
-                newRefreshToken,
-                Duration.ofDays(14)
-        );
-        return new TokenResponse(newAccessToken, newRefreshToken);
     }
 
     public void checkDuplicatedEmail(CheckEmailRequest request){
-        Boolean isDuplicated = authRepository.existsByEmail(request.email());
+        boolean isDuplicated = authRepository.existsByEmail(request.email());
         if(isDuplicated) {
             throw new EmailAlreadyExistsException(ErrorCode.RESOURCE_CONFLICT);
         }
     }
 
     public void checkDuplicatedNickname(CheckNicknameRequest request){
-        Boolean isDuplicated = userRepository.existsByNickname(request.nickname());
+        boolean isDuplicated = userRepository.existsByNickname(request.nickname());
         if(isDuplicated) {
             throw new NicknameAlreadyExistsException(ErrorCode.RESOURCE_CONFLICT);
         }
@@ -174,4 +130,5 @@ public class AuthService {
 
         auth.setPasswordHash(passwordEncoder.encode(request.password()));
     }
+
 }
