@@ -1,19 +1,16 @@
 package com.vani.week4.backend.global;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 토큰에서 유저를 가져오기위한 어노테이션
+ * 세션에서 유저를 가져오기위한 어노테이션
  * @author vani
  * @since 10/14/25
  */
 @Target(ElementType.PARAMETER)          // 파라메터에 붙일 수 있는 @
 @Retention(RetentionPolicy.RUNTIME)     // 런타임에 스프링이 인식
-@AuthenticationPrincipal(expression = "#this == 'anonymousUser' ? null : user")
 public @interface CurrentUser {
 }
