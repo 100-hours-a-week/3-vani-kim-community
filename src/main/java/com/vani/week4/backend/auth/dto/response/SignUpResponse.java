@@ -7,15 +7,6 @@ package com.vani.week4.backend.auth.dto.response;
  *
  */
 public record SignUpResponse (
-    String userId,
-    String accessToken,
-    String refreshToken
+    String userId
 ) {
-    public static SignUpResponse of(
-            String userId,
-            String accessToken,
-            String refreshToken
-    ) {
-        return new SignUpResponse(userId, accessToken, refreshToken);
-    }
 }
