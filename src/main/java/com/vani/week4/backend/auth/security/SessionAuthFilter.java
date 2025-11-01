@@ -92,7 +92,6 @@ public class SessionAuthFilter extends OncePerRequestFilter {
         }
     }
 
-
     /**
      * JSON 에러 응답을 직접 만들어주는 헬퍼 메서드
      * 지금 단계에서 에러는 디스패처 서블렛으로 가지 못해서 글로벌 핸들러가 처리할 수 없음

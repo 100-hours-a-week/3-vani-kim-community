@@ -21,7 +21,7 @@ public class SessionCleanupScheduler {
     // 자바 스케쥴러
     private ScheduledExecutorService scheduler;
 
-    // 이 빈이 생성된 직후 시작하기
+    // 이 빈이 생성된 직후 시작
     @PostConstruct
     public void startScheduler(){
         //백그라운드에서 돌릴 스레드 1개 짜리 스케쥴러
@@ -37,7 +37,7 @@ public class SessionCleanupScheduler {
     }
 
     // 앱이 종료되기 직전 "종료"
-    // 지금하던 일까지 하고 새로운 일 받지 말고 종료
+    // 지금하던 일까지 하고 새로운 일 받지 말고 종료합니다.
     @PreDestroy
     public void stopScheduler(){
         if(scheduler != null){
