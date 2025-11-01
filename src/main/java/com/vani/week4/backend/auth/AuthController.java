@@ -45,8 +45,11 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // 로그인/토큰 발급
-    // Access토큰은 보안헤더에, refresh토큰은 쿠키에 담아, 사용자의 닉네입과 함께 반환한다.
+    /**
+     * 로그인/토큰 발급 메서드
+     * Access토큰은 보안헤더에, refresh토큰은 쿠키에 담아, 사용자의 닉네입과 함께 반환한다.
+     * @return : 사용자의 닉네임
+     */
     @PostMapping("/tokens")
     public ResponseEntity<Map<String,String>> login(
             @Valid @RequestBody LoginRequest request,
@@ -63,8 +66,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
-    //로그아웃
-    //서버의 저장하고 있는 인증관련 토큰을 폐기하고 사용자의 토큰용 쿠키를 폐기시킨다.
+    /**
+     * 로그아웃을 처리합니다.
+     * 서버의 Refresh 토큰을 삭제하고 클라이언트의 토큰 쿠키를 만료시킵니다.
+     *
+     * @return 204 No Content
+     */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response){
         Optional<String> refreshToken = extractRefreshTokenFromCookie(request);
@@ -77,8 +84,13 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    //토큰 갱신
-    //Refresh 토큰의 유효성을 검사하고 새 Access토큰을 보안 헤더, 새 Refresh 토큰은 쿠키에 반환한다
+    /**
+     * Access 토큰과 Refresh 토큰을 재발급합니다.
+     * Refresh 토큰의 유효성을 검증하고 새로운 토큰 쌍을 발급합니다.
+     *
+     * @return 204 No Content
+     * @throws InvalidTokenException Refresh 토큰이 없거나 유효하지 않은 경우
+     */
     //TODO 필터에서 Refresh 토큰도 처리해서 토큰을 꺼내 주는 것이 필요할 듯 하다.
     //TODO 유효성 검사를 여기서 할 필요가 있나??
     @PostMapping("/refresh")
@@ -111,7 +123,7 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    //Auth 테이블에 존재하는 이메일 중복 확인.
+    //Auth 테이블에 존재하는 이메일 중복 확인 메서드
     @GetMapping("/email")
     public ResponseEntity<?> checkDuplicatedEmail(
             @Valid CheckEmailRequest request) {
@@ -119,7 +131,7 @@ public class AuthController {
         return ResponseEntity.ok("사용 가능한 이메일입니다.");
     }
 
-    //Auth 테이블에 존재하는 닉네임 중복확인
+    //Auth 테이블에 존재하는 닉네임 중복확인 메서드
     @GetMapping("/nickname")
     public ResponseEntity<?> checkDuplicatedNickname(
             @Valid CheckNicknameRequest request) {
