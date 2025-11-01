@@ -127,7 +127,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
 
-        log.warn("이미 존재하는 이메일 : code={}, msg={}", code.getMessage(), ex.getMessage());
+        log.warn("이미 존재하는 닉네임 : code={}, msg={}", code.getMessage(), ex.getMessage());
 
         return new ResponseEntity<>(response, code.getStatus());
     }
@@ -160,6 +160,18 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
 
         log.warn("유저 접근 거부 : code={}, msg={}", code.getMessage(), ex.getMessage());
+
+        return new ResponseEntity<>(response, code.getStatus());
+    }
+
+
+    @ExceptionHandler(UserDeletedException.class)
+    public ResponseEntity<ErrorResponse> handleUserDeletedException(UserDeletedException ex){
+        ErrorCode code = ex.getErrorCode();
+
+        ErrorResponse response = new ErrorResponse(code.getCode(), ex.getMessage());
+
+        log.warn("탈퇴한 유저입니다. : code={}, msg={}", code.getMessage(), ex.getMessage());
 
         return new ResponseEntity<>(response, code.getStatus());
     }
