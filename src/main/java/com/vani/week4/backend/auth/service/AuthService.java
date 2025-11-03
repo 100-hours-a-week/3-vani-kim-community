@@ -226,7 +226,7 @@ public class AuthService {
     /**
      * 토큰에서 유저 아이디를 가져오는 메서드
      * */
-    //TODO 모든 에러가 결국 같은것을 던져서 뭔지 알아 보기가 어렵다. 수정 필요
+    // TODO currentUser 어노테이션과 하는일이 같음 변경 필요
     private String getUserIdFromToken(String token){
         Claims claims;
         //토큰 자체 유효성 검사
