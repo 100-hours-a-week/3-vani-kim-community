@@ -2,6 +2,7 @@ package com.vani.week4.backend.user.service;
 
 import com.vani.week4.backend.auth.dto.request.SignUpRequest;
 import com.vani.week4.backend.auth.service.AuthService;
+import com.vani.week4.backend.infra.S3.S3Service;
 import com.vani.week4.backend.user.dto.WithdrawRequest;
 import com.vani.week4.backend.auth.entity.Auth;
 import com.vani.week4.backend.auth.entity.ProviderType;
@@ -27,17 +28,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final AuthService authService;
+    private final S3Service s3Service;
     //순환참조 해결용
-    public UserService(
+    protected UserService(
             UserRepository userRepository,
-            @Lazy AuthService authService
+            @Lazy AuthService authService,
+            S3Service s3Service
     ) {
         this.userRepository = userRepository;
         this.authService = authService;
+        this.s3Service = s3Service;
     }
     //TODO 테이블 수정 필요 User-UserAuth 이메일....
     public UserResponse getUserInfo(User user) {
-        return new UserResponse(user.getNickname(), user.getProfileImageKey());
+        String presignedGetUrl = s3Service.createPresignedGetUrl(user.getProfileImageKey());
+
+        return new UserResponse(user.getNickname(), presignedGetUrl);
     }
 
     @Transactional

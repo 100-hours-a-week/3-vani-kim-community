@@ -1,7 +1,7 @@
 package com.vani.week4.backend.infra;
 
 import com.vani.week4.backend.infra.S3.FileCategory;
-import com.vani.week4.backend.infra.S3.PresignResponse;
+import com.vani.week4.backend.infra.S3.dto.PresignResponse;
 
 //TODO 이미지 처리와 회원가입, 게시글 생성등의 API 분리하기
 /**

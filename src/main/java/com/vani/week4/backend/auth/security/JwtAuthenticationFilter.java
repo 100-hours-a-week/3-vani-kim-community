@@ -38,6 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     //필터 제외 경로 목록
     private static final String[] EXCLUDED_PATHS = {
             "/auth/users", "/auth/tokens", "/auth/nickname", "/auth/email","/auth/logout", "/auth/refresh",
+            "/api/v1/uploads/presign/temp",
             "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"
     };
 

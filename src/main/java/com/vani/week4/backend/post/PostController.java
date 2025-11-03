@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
  */
 //TODO  1. 업데이트 된 새로운 게시글들로 돌아가는 api추가
 //TODO  2. 게시글 검색 추가
+//TODO 이미지 여러장 가능 하게 변경
 //XXX 돌아갔을떄 다시 보여준거 보여줄지도 결정...
 @RequiredArgsConstructor
 @RestController
@@ -78,7 +79,7 @@ public class PostController {
     }
 
     //게시글 삭제
-    //TODO softdelete 검토
+    //TODO soft-delete 검토
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePost(
             @CurrentUser User user,

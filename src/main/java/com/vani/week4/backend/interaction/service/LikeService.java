@@ -8,11 +8,11 @@ import com.vani.week4.backend.interaction.repository.LikeRepository;
 import com.vani.week4.backend.post.entity.Post;
 import com.vani.week4.backend.post.repository.PostRepository;
 import com.vani.week4.backend.user.entity.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 /**
  * 좋아요 관련 로직을 처리하는 클래스
@@ -20,6 +20,7 @@ import software.amazon.awssdk.services.s3.endpoints.internal.Value;
  * @author vani
  * @since 10/15/25
  */
+@Slf4j
 @Service
 public class LikeService {
     private static final String LIKE_COUNT_KEY_PREFIX = "post:like:";
@@ -54,7 +55,7 @@ public class LikeService {
 
         //이미 좋아요 했다면 삭제, 안했으면 좋아요
         //레디스에 카운트 캐싱
-        //키는 텍스트로 읽기 좋게
+        //키는 텍스트로 가독성 향상
         if (likeRepository.existsById(new UserPostLikeId(userId, postId))){
             likeRepository.deleteById(new UserPostLikeId(userId, postId));
             likesRedisTemplate.opsForValue().decrement(LIKE_COUNT_KEY_PREFIX + postId);
@@ -67,17 +68,25 @@ public class LikeService {
     /**
      * Redis에서 좋아요수를 조회하고 없다면 DB에서 로드합니다.
      */
-     private Integer getLikeCount(String postId){
-         String redisKey = LIKE_COUNT_KEY_PREFIX + postId;
-         Object value = likesRedisTemplate.opsForValue().get(redisKey);
+    @Transactional
+    public Integer getLikeCount(String postId){
+        log.info("===== 🔄 좋아요 수 조회 시작: PostId [{}] =====", postId);
 
-         if (value == null){
-             //DB에서 조회 후 Redis에 캐싱
-             int count = likeRepository.countByUserPostLikeIdPostId(postId);
-             likesRedisTemplate.opsForValue().set(redisKey,count);
-             return count;
-         }
+        String redisKey = LIKE_COUNT_KEY_PREFIX + postId;
+        Object value = likesRedisTemplate.opsForValue().get(redisKey);
+        log.info("🚨 레디스에서 조회 한 값: [{}]", value);
+        if (value == null){
+            log.warn("🚨 레디스 조회 실패: Redis에 [{}] 키로 저장된 값이 없습니다.", postId);
 
-         return Integer.parseInt(value.toString());
-     }
+            //DB에서 조회 후 Redis에 캐싱
+            int count = likeRepository.countByUserPostLikeIdPostId(postId);
+            log.info("🔄 디비에서 조회 한 값: [{}]", count);
+            likesRedisTemplate.opsForValue().set(redisKey,count);
+            return count;
+        }
+        Object value2 = likesRedisTemplate.opsForValue().get(redisKey);
+        log.warn(" 레디스에 잘 저장되었는지 조회 : Redis에 [{}] 키로 저장된 값 [{}].", postId, value2);
+
+        return Integer.parseInt(value.toString());
+    }
 }
