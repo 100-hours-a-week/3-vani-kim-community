@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotBlank;
  */
 public record PresignRequest(
         @NotBlank(message = "파일명은 필수입니다")
-        String filename,
+        String fileName,
         @NotBlank(message = "콘텐츠 타입은 필수입니다")
         String contentType,
         @NotBlank(message = "파일 사이즈는 필수입니다")
