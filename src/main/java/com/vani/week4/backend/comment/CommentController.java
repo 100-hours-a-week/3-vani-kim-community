@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 //TODO 댓글 추천(좋아요), 댓글 정렬(추천,시간)
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/posts/{postId}/comments")
+@RequestMapping("api/v1/posts/{postId}/comments")
 public class CommentController {
     private final CommentService commentService;
 

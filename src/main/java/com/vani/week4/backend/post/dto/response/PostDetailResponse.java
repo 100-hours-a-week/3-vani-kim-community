@@ -17,7 +17,7 @@ public record PostDetailResponse (
 ) {
     public record ContentDetail(
             String content,
-            String postImageKey
+            String postImageUrl
     ) {}
     public record Author (
             String nickname

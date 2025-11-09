@@ -4,11 +4,12 @@ import com.github.f4b6a3.ulid.UlidCreator;
 import com.vani.week4.backend.global.ErrorCode;
 import com.vani.week4.backend.global.exception.PostNotFoundException;
 import com.vani.week4.backend.global.exception.UnauthorizedException;
+import com.vani.week4.backend.infra.S3.S3Service;
 import com.vani.week4.backend.interaction.repository.LikeRepository;
+import com.vani.week4.backend.interaction.service.LikeService;
 import com.vani.week4.backend.post.dto.request.PostCreateRequest;
 import com.vani.week4.backend.post.dto.request.PostUpdateRequest;
 import com.vani.week4.backend.post.dto.response.PostDetailResponse;
-import com.vani.week4.backend.post.dto.response.PostResponse;
 import com.vani.week4.backend.post.dto.response.PostSummaryResponse;
 import com.vani.week4.backend.global.dto.SliceResponse;
 import com.vani.week4.backend.post.entity.Post;
@@ -16,6 +17,7 @@ import com.vani.week4.backend.post.entity.PostContent;
 import com.vani.week4.backend.post.repository.PostRepository;
 import com.vani.week4.backend.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -30,11 +32,15 @@ import java.util.List;
  * @author vani
  * @since 10/14/25
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
+    private final LikeService likeService;
+    private final S3Service s3Service;
+
     /**
      * 게시글 목록 커서 페이징을 위한 메서드, 생성일자와 Id 기준으로 내림차순
      * @param cursorId : 커서 페이징을 위한 postId
@@ -74,7 +80,7 @@ public class PostService {
         if (!posts.hasNext() || posts.getContent().isEmpty()) {
             return null;
         }
-        Post lastPost = posts.getContent().get(posts.getContent().size() - 1);
+        Post lastPost = posts.getContent().getLast();
         return new SliceResponse.Cursor(
                 lastPost.getId(),
                 lastPost.getCreatedAt()
@@ -85,8 +91,9 @@ public class PostService {
      * 응답 DTO로 변환하는 메서드
      * */
     private PostSummaryResponse toPostSummaryResponse(Post post) {
+        String postId = post.getId();
         return new PostSummaryResponse(
-                post.getId(),
+                postId,
                 post.getTitle(),
                 post.getCreatedAt(),
                 new PostSummaryResponse.Author(
@@ -94,7 +101,7 @@ public class PostService {
                         post.getUser().getProfileImageKey()
                 ),
                 new PostSummaryResponse.Stats(
-                        post.getLikeCount(),
+                        likeService.getLikeCount(postId),
                         post.getCommentCount(),
                         post.getViewCount()
                 )
@@ -105,13 +112,21 @@ public class PostService {
      * 게시글 id를 이용하여 게시글 상세 정보를 불러 오는 메서드
      * @param postId : 게시글 아이디
      * */
+    @Transactional
     public PostDetailResponse getPostDetail(String postId, User currentUser) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
         //TODO Count 로직 개선 필요
+        String imageKey = post.getPostContent().getPostImageKey();
+        String imageUrl = null;
+
+        if (imageKey != null && !imageKey.isEmpty()) {
+            imageUrl = s3Service.createPresignedGetUrl(imageKey);
+        }
+
         post.incrementViewCount();
         Boolean isLiked = likeRepository.existsByUserIdAndPostId(currentUser.getId(), postId);
-        return toPostDetailResponse(post, isLiked);
+        return toPostDetailResponse(post, imageUrl, isLiked);
     }
 
     /**
@@ -138,7 +153,14 @@ public class PostService {
 
         postRepository.save(post);
 
-        return toPostDetailResponse(post, false);
+        if (request.postImageKey() != null) {
+            log.warn("🚨 지금 여기 하면 안된다. [{}] ", request.postImageKey());
+
+            String  imageUrl = s3Service.createPresignedGetUrl(request.postImageKey());
+            return toPostDetailResponse(post, imageUrl, false);
+        } else {
+            return toPostDetailResponse(post, null, false);
+        }
     }
 
     /**
@@ -174,28 +196,29 @@ public class PostService {
 
         post.updateModifiedDate();
         Boolean isLiked = likeRepository.existsByUserIdAndPostId(user.getId(), postId);
+        String postImageUrl = s3Service.createPresignedGetUrl(post.getPostContent().getPostImageKey());
 
-        return toPostDetailResponse(post, isLiked);
+        return toPostDetailResponse(post, postImageUrl, isLiked);
     }
 
-    private PostDetailResponse toPostDetailResponse(Post post, Boolean isLiked) {
+    private PostDetailResponse toPostDetailResponse(Post post, String postImageUrl, Boolean isLiked) {
         PostContent content = post.getPostContent();
         User user = post.getUser();
-
+        String postId = post.getId();
         return new PostDetailResponse(
-                post.getId(),
+                postId,
                 post.getTitle(),
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
                 new PostDetailResponse.ContentDetail(
-                        post.getPostContent().getContent(),
-                        post.getPostContent().getPostImageKey()
+                        content.getContent(),
+                        postImageUrl
                 ),
                 new PostDetailResponse.Author(
-                        post.getUser().getNickname()
+                        user.getNickname()
                 ),
                 new PostDetailResponse.Stats(
-                        post.getLikeCount(),
+                        likeService.getLikeCount(postId),
                         post.getCommentCount(),
                         post.getViewCount(),
                         isLiked
@@ -204,7 +227,7 @@ public class PostService {
     }
 
     /**
-     * 게시글을 삭제하는 메서드, 완전 삭제(postcontent, like, comment)
+     * 게시글을 삭제하는 메서드, 완전 삭제(postContent, like, comment)
      * */
     @Transactional
     public void deletePost(User user, String postId) {

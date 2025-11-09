@@ -1,7 +1,5 @@
 package com.vani.week4.backend.user.dto;
 
-import com.vani.week4.backend.user.entity.User;
-import lombok.*;
 
 /**
  * @author vani
@@ -9,6 +7,6 @@ import lombok.*;
  */
 public record UserResponse(
     String nickname,
-    String profileImageKey
+    String presignedProfileImageUrl
 ) {}
 
