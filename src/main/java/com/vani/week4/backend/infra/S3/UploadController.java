@@ -31,7 +31,7 @@ public class UploadController {
     ) {
         PresignResponse response = storageService.createPresignedUrl(
                 user.getId(),
-                request.filename(),
+                request.fileName(),
                 request.contentType(),
                 request.category(),
                 request.fileSizeByte()
@@ -48,7 +48,7 @@ public class UploadController {
     ) {
         PresignResponse response = storageService.createPresignedUrl(
                 UUID.randomUUID().toString(),
-                request.filename(),
+                request.fileName(),
                 request.contentType(),
                 FileCategory.TEMP_PROFILE_IMAGE,
                 request.fileSizeByte()

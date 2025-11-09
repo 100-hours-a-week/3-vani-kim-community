@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 // TODO 좋아요한 게시글 가져오기
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api/v1/users")
 public class UserController {
 
     private final UserService userService;

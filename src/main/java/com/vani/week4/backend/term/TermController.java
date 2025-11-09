@@ -3,6 +3,7 @@ package com.vani.week4.backend.term;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author vani
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 //HTML반환
 @Controller
+@RequestMapping("api/v1")
 public class TermController {
 
     @GetMapping("/terms-of-service")

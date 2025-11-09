@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 //XXX 돌아갔을떄 다시 보여준거 보여줄지도 결정...
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("api/v1/posts")
 public class PostController {
 
     private final PostService postService;

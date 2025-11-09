@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-@RequestMapping("/post/{postId}/likes")
+@RequestMapping("api/v1/post/{postId}/likes")
 public class LikeController {
     private final LikeService likeService;
 
