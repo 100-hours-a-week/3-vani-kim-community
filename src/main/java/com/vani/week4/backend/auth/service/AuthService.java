@@ -153,6 +153,7 @@ public class AuthService {
             );
         } catch (Exception e) {
             log.error("Redis에 리프레시 토큰 저장 실패. UserId: {}", userId, e);
+            throw new TokenSaveException("리프레시 토큰 저장 중 오류 발생, 로그아웃", ErrorCode.UNAUTHORIZED);
         }
         return new TokenResponse(newAccessToken, newRefreshToken);
     }
