@@ -163,6 +163,7 @@ public class AuthService {
      * 토큰을 폐기하는 메서드
      * @param refreshToken : 요청자에게 전달 받은 refresh 토큰
      * */
+    // TODO 인증 서비스가 아니면 어디서 할지 확인. 프론트에서 해야하는지 고민
     public void deleteToken(String refreshToken) {
         String userId = getUserIdFromToken(refreshToken);
 
