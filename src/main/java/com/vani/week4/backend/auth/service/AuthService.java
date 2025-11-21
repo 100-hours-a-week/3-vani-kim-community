@@ -73,6 +73,7 @@ public class AuthService {
      * @return : 인증용 토큰 발급
      * */
     // TODO : 삭제 후 재로그인 전략 필요
+    @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
         // 인증 정보 확인
         Auth auth = authRepository.findByEmail(request.email())

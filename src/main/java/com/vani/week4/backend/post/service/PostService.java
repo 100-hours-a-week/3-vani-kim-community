@@ -64,13 +64,13 @@ public class PostService {
      * */
     private SliceResponse<PostSummaryResponse> convertToSliceResponse(Slice<Post> posts) {
         // Entity -> DTO 변환
-        List<PostSummaryResponse> content = posts.getContent().stream()
+        List<PostSummaryResponse> items = posts.getContent().stream()
                 .map(this::toPostSummaryResponse)
                 .toList();
 
         SliceResponse.Cursor nextCursor = createNewNextCursor(posts);
 
-        return new SliceResponse<>(content, nextCursor, posts.hasNext());
+        return new SliceResponse<>(items, nextCursor, posts.hasNext());
     }
 
     /**
@@ -154,7 +154,7 @@ public class PostService {
         postRepository.save(post);
 
         if (request.postImageKey() != null) {
-            log.warn("🚨 지금 여기 하면 안된다. [{}] ", request.postImageKey());
+            log.warn("이미지키 없음. [{}] ", request.postImageKey());
 
             String  imageUrl = s3Service.createPresignedGetUrl(request.postImageKey());
             return toPostDetailResponse(post, imageUrl, false);

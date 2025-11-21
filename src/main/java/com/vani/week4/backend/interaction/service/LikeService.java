@@ -52,7 +52,7 @@ public class LikeService {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
-
+        log.info("좋아요 처리중 {} ", userId);
         //이미 좋아요 했다면 삭제, 안했으면 좋아요
         //레디스에 카운트 캐싱
         //키는 텍스트로 가독성 향상
@@ -70,23 +70,15 @@ public class LikeService {
      */
     @Transactional
     public Integer getLikeCount(String postId){
-        log.info("===== 🔄 좋아요 수 조회 시작: PostId [{}] =====", postId);
 
         String redisKey = LIKE_COUNT_KEY_PREFIX + postId;
         Object value = likesRedisTemplate.opsForValue().get(redisKey);
-        log.info("🚨 레디스에서 조회 한 값: [{}]", value);
         if (value == null){
-            log.warn("🚨 레디스 조회 실패: Redis에 [{}] 키로 저장된 값이 없습니다.", postId);
-
             //DB에서 조회 후 Redis에 캐싱
             int count = likeRepository.countByUserPostLikeIdPostId(postId);
-            log.info("🔄 디비에서 조회 한 값: [{}]", count);
             likesRedisTemplate.opsForValue().set(redisKey,count);
             return count;
         }
-        Object value2 = likesRedisTemplate.opsForValue().get(redisKey);
-        log.warn(" 레디스에 잘 저장되었는지 조회 : Redis에 [{}] 키로 저장된 값 [{}].", postId, value2);
-
         return Integer.parseInt(value.toString());
     }
 }

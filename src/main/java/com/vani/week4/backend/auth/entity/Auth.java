@@ -23,12 +23,13 @@ public class Auth {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(length = 300)
+    @Column(length = 300, nullable = false, unique = true)
     private String email;
 
     @Column(length = 10)
     private ProviderType provider;
 
+    @Column(nullable = false)
     private String passwordHash;
 
     //정적 팩토리, 상태변경, 연관관계 편의 메서드, 내부계산, 간단 검증

@@ -39,7 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String[] EXCLUDED_PATHS = {
             "/api/v1/auth/users", "/api/v1/auth/tokens", "/api/v1/auth/nickname", "/api/v1/auth/email",
             "/api/v1/auth/logout", "/api/v1/auth/refresh", "/api/v1/uploads/presign/temp",
-            "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"
+            "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
+            "/api/loadtest/**"  // 부하 테스트 API (개발/테스트 환경 전용)
     };
 
     // 필터 제외 경로 설정
@@ -67,8 +68,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-
-        logger.debug("JWT Authentication Filter Started" + (request).getRequestURI());
 
         Optional<String> token = extractToken(request);
 
@@ -137,7 +136,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void validateAndSetAttributes(String token, HttpServletRequest request) {
 
         var jws = jwtTokenProvider.parse(token);
-        Claims body = jws.getBody();  // Claims? 내용물.
+        Claims body = jws.getBody();  // Claims 내용물.
         request.setAttribute("authenticatedUserId", body.getSubject());
 
         String roleStr = body.get("role", String.class);

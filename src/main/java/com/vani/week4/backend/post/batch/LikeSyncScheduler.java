@@ -65,8 +65,6 @@ public class LikeSyncScheduler {
                 //DB 업데이트
                 postRepository.findById(postId).ifPresent(post -> {
                     post.updateLikeCount(likeCount);
-                    log.debug("Post {} 좋아요 수 업데이트: {}", postId, likeCount);
-
                 });
 
                 syncCount++;
